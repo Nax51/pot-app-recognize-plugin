@@ -1,33 +1,25 @@
 {
-  "id": "plugin.com.pot-app.openai_recognize",
+  "id": "plugin.com.pot-app.mistral_recognize",
   "plugin_type": "recognize",
-  "icon": "openai.svg",
-  "display": "OpenAI",
-  "homepage": "https://github.com/pot-app/pot-app-recognize-plugin-openai",
+  "icon": "mistral.svg",
+  "display": "Mistral AI",
+  "homepage": "https://github.com/pot-app/pot-app-recognize-plugin-mistral",
   "needs": [
     {
       "key": "model",
       "display": "模型",
-      "type": "select",
-      "options": {
-        "gpt-4o": "GPT-4o",
-        "gpt-4o-mini": "GPT-4o-Mini",
-        "gpt-4-vision-preview": "GPT-4 Vision Preview"
-      }
+      "type": "input",
+      "default": "mistral-ocr-latest"
     },
     {
       "key": "requestPath",
       "display": "请求路径",
-      "type": "input"
+      "type": "input",
+      "default": "https://api.mistral.ai/v1/ocr"
     },
     {
       "key": "apiKey",
       "display": "API Key",
-      "type": "input"
-    },
-    {
-      "key": "customPrompt",
-      "display": "自定义 Prompt",
       "type": "input"
     }
   ],
