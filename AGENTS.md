@@ -1,223 +1,323 @@
-# Agents.md - Pot-App OpenAI Recognition Plugin
+# AGENTS.md
+
+This file provides guidance for AI agents working with the Pot App Recognize Plugin repository.
 
 ## Project Overview
 
-This is a recognition plugin for Pot-App that uses OpenAI's vision models (GPT-4o, GPT-4o-Mini, GPT-4 Vision Preview) to perform OCR (Optical Character Recognition) on images. The plugin converts base64-encoded images into text using OpenAI's API.
+This repository contains OCR (Optical Character Recognition) plugins for [Pot App](https://pot-app.com/), a cross-platform translation and OCR application. The plugins enable text recognition from images using AI vision models from OpenAI and Mistral AI.
 
-### Purpose
-Enable AI-powered text recognition from images within the Pot-App ecosystem, supporting multiple languages and customizable prompts.
-
-### Key Technologies
-- JavaScript (ES6+)
-- OpenAI Vision API
-- Tauri Framework (for HTTP requests)
-- Pot-App Plugin System
+**Repository Purpose**: Develop and maintain recognize plugins that integrate AI vision APIs for OCR functionality in Pot App.
 
 ## Project Structure
 
 ```
-pot-app-recognize-plugin-openai/
-├── main.js           # Core plugin logic with recognize() function
-├── info.json         # Plugin metadata and configuration schema
-├── openai.svg        # Plugin icon
-├── README.md         # Basic project documentation
-└── LICENSE           # Project license
+pot-app-recognize-plugin/
+├── plugin.com.pot-app.openai_recognize/     # OpenAI vision plugin
+│   ├── info.json                            # Plugin metadata & configuration schema
+│   ├── main.js                              # Plugin implementation
+│   └── openai.svg                           # Plugin icon
+├── plugin.com.pot-app.mistralai_recognize/  # Mistral AI OCR plugin
+│   ├── info.json                            # Plugin metadata & configuration schema
+│   ├── main.js                              # Plugin implementation
+│   └── mistral.svg                          # Plugin icon
+├── script/
+│   ├── pack-plugins.py                      # Python script to package plugins
+│   └── pack-plugins.sh                      # Shell script to package plugins
+├── *.potext                                 # Compiled plugin packages (zip files)
+└── AGENTS.md                                # This file
 ```
 
-### File Descriptions
+### Key Components
 
-- **main.js**: Contains the `recognize()` async function that handles the OCR process
-- **info.json**: Defines plugin metadata, configuration options, and supported languages
-- **openai.svg**: Visual icon for the plugin in Pot-App interface
+- **Plugin Directories**: Each `plugin.com.pot-app.*_recognize/` directory contains a complete plugin
+- **info.json**: Defines plugin metadata, configuration UI, and supported languages
+- **main.js**: Contains the `recognize(base64, lang, options)` async function that performs OCR
+- **.potext files**: ZIP archives containing plugin files for distribution
 
-## Architecture
+## Plugin Architecture
 
-### Plugin Entry Point
-The main entry point is the `recognize()` function exported from `main.js`:
+### Plugin Interface
 
+Each plugin must implement the following structure:
+
+**Required Files**:
+1. `info.json` - Plugin metadata and configuration
+2. `main.js` - Plugin implementation with `recognize()` function
+3. `*.svg` - Plugin icon file
+
+**Main Function Signature**:
 ```javascript
-async function recognize(base64, lang, options)
+async function recognize(base64, lang, options) {
+    const { config, utils } = options;
+    const { tauriFetch: fetch } = utils;
+    // Implementation
+    return recognizedText;
+}
 ```
 
-**Parameters:**
+**Parameters**:
 - `base64`: Base64-encoded image data (without data URI prefix)
-- `lang`: Target language code (e.g., "en", "zh_cn", "ja")
-- `options`: Object containing `config` and `utils`
-  - `config`: User configuration (model, apiKey, requestPath, customPrompt)
-  - `utils`: Utility functions including `tauriFetch`
+- `lang`: Language code for recognition hint (e.g., "zh_cn", "en", "ja")
+- `options.config`: User configuration from `info.json` needs
+- `options.utils.tauriFetch`: HTTP fetch wrapper for making API requests
 
-**Returns:** Promise<string> - Recognized text from the image
+**Return Value**: String containing recognized text
 
-### API Integration
-The plugin communicates with OpenAI's Chat Completions API endpoint:
-- Default endpoint: `https://api.openai.com/v1/chat/completions`
-- Supports custom endpoints for API proxies or alternative providers
-- Uses bearer token authentication
+### Configuration Schema (info.json)
+
+```json
+{
+  "id": "plugin.com.pot-app.{name}_recognize",
+  "plugin_type": "recognize",
+  "icon": "{name}.svg",
+  "display": "Display Name",
+  "homepage": "https://github.com/...",
+  "needs": [
+    {
+      "key": "model",
+      "display": "模型",
+      "type": "input",
+      "default": "default-model-name"
+    }
+  ],
+  "language": { /* ISO language codes */ }
+}
+```
 
 ## Coding Conventions
 
-### Code Style
-1. **Async/Await**: Always use async/await for asynchronous operations
-2. **Destructuring**: Use object destructuring for cleaner code
-3. **Template Literals**: Use backticks for string interpolation
-4. **Error Handling**: Throw descriptive error messages with HTTP status information
+### JavaScript Style
+
+- **ES6+ async/await**: Use modern async patterns, no callbacks
+- **Destructuring**: Extract config and utils from options parameter
+- **Template literals**: Use backticks for string interpolation
+- **Error handling**: Throw descriptive error messages with HTTP status
+- **No semicolons**: Follow the existing no-semicolon style (optional)
 
 ### Naming Conventions
-- **Variables**: camelCase (e.g., `requestPath`, `customPrompt`, `apiKey`)
+
+- **Plugin directories**: `plugin.com.pot-app.{service}_recognize`
+- **Plugin IDs**: Same as directory name in info.json
+- **Configuration keys**: camelCase (e.g., `apiKey`, `requestPath`, `customPrompt`)
 - **Functions**: camelCase (e.g., `recognize`)
-- **Constants**: Use const for immutable values
+- **Constants**: UPPER_SNAKE_CASE for true constants
 
-### Configuration Keys
-Configuration parameters follow these conventions:
-- `model`: OpenAI model selection
-- `requestPath`: API endpoint URL
-- `apiKey`: OpenAI API authentication key
-- `customPrompt`: User-defined system prompt (can include `$lang` placeholder)
+### API Request Pattern
 
-## Development Guidelines
+Follow this standard pattern for API calls:
 
-### Adding New Features
+```javascript
+// 1. Extract and set defaults for config values
+let { model = "default-model", apiKey, requestPath } = config;
 
-When adding new functionality:
-1. Maintain backward compatibility with existing configuration
-2. Update `info.json` if adding new configuration options
-3. Use the existing `tauriFetch` utility for HTTP requests
-4. Follow the existing error handling pattern
+// 2. Normalize requestPath (add protocol, remove trailing slash)
+if (!requestPath) {
+    requestPath = "https://default.api.url";
+}
+if (!/https?:\/\/.+/.test(requestPath)) {
+    requestPath = `https://${requestPath}`;
+}
+if (requestPath.endsWith('/')) {
+    requestPath = requestPath.slice(0, -1);
+}
 
-### Request Path Processing
-The plugin normalizes API endpoints with these rules:
-1. Add `https://` protocol if missing
-2. Remove trailing slashes
-3. Append `/v1/chat/completions` if not present
+// 3. Build request headers
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`
+}
 
-### Language Support
-Languages are defined in `info.json` under the `language` key. When adding support:
-1. Use ISO language codes (e.g., "zh_cn", "en", "ja")
-2. Provide English display names
-3. The `$lang` variable in custom prompts will be replaced with the language value
+// 4. Build request body
+const body = { /* API-specific structure */ }
+
+// 5. Make request using tauriFetch
+let res = await fetch(requestPath, {
+    method: 'POST',
+    url: requestPath,
+    headers: headers,
+    body: {
+        type: "Json",
+        payload: body
+    }
+});
+
+// 6. Handle response
+if (res.ok) {
+    let result = res.data;
+    return extractText(result);
+} else {
+    throw `Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`;
+}
+```
+
+### Default Values
+
+Always provide sensible defaults for configuration:
+- **Model**: Specify the latest/recommended model as default
+- **Request Path**: Use official API endpoint as default
+- **Custom Prompt**: Provide a default prompt that works for most cases
+
+Example:
+```javascript
+let { 
+    model = "gpt-5-mini",  // Default model
+    apiKey,                 // Required, no default
+    requestPath = "https://api.openai.com",  // Default endpoint
+    customPrompt = "Just recognize the text in the image."  // Default prompt
+} = config;
+```
 
 ## Testing
 
 ### Manual Testing
-1. Install the plugin in Pot-App
-2. Configure with a valid OpenAI API key
-3. Test with various image types:
-   - Screenshots with text
-   - Photos of documents
-   - Images with multiple languages
-   - Low-quality/high-quality images
 
-### Test Cases
-- Valid API key with default settings
-- Custom API endpoint (proxy)
-- Custom prompt with `$lang` placeholder
-- Different model selections (gpt-4o, gpt-4o-mini, gpt-4-vision-preview)
-- Error scenarios (invalid API key, network errors, malformed images)
+Since these are Pot App plugins, testing requires:
 
-### Expected Behavior
-- **Success**: Returns plain text content from image
-- **Failure**: Throws error with HTTP status and response details
+1. **Build the plugin**: Run `python3 script/pack-plugins.py` to create .potext files
+2. **Install in Pot App**: Copy .potext files to Pot App's plugin directory
+3. **Configure**: Set API key and other required settings in Pot App
+4. **Test Recognition**: Use Pot App to capture and recognize text from images
 
-## API Documentation
+### Testing Checklist
 
-### OpenAI Vision API Requirements
-- **Model**: Must support vision capabilities (gpt-4o, gpt-4o-mini, gpt-4-vision-preview)
-- **Image Format**: Base64-encoded, prefixed with `data:image/png;base64,`
-- **Detail Level**: Set to "high" for better OCR accuracy
-- **Authentication**: Bearer token in Authorization header
+When adding or modifying a plugin:
 
-### Request Body Structure
-```json
-{
-  "model": "gpt-4o",
-  "messages": [
-    {
-      "role": "system",
-      "content": [{"type": "text", "text": "prompt"}]
-    },
-    {
-      "role": "user",
-      "content": [
-        {
-          "type": "image_url",
-          "image_url": {
-            "url": "data:image/png;base64,...",
-            "detail": "high"
-          }
-        }
-      ]
-    }
-  ]
+- [ ] Plugin compiles to .potext successfully
+- [ ] info.json schema is valid
+- [ ] All required files (info.json, main.js, icon.svg) are present
+- [ ] API requests work with default configuration
+- [ ] Error messages are descriptive
+- [ ] Custom requestPath is properly normalized
+- [ ] Default values are sensible and documented
+- [ ] Supports multiple languages from language map
+
+## Building & Packaging
+
+### Build Process
+
+To package plugins into .potext files:
+
+```bash
+# Package all plugins
+python3 script/pack-plugins.py
+
+# Package specific plugin
+python3 script/pack-plugins.py plugin.com.pot-app.openai_recognize
+```
+
+The script will:
+1. Validate required files exist (info.json, main.js, *.svg)
+2. Create a ZIP archive with .potext extension
+3. Include only the three required files (no LICENSE, README, etc.)
+
+### Adding New Plugins
+
+To add a new recognize plugin:
+
+1. **Create plugin directory**: `plugin.com.pot-app.{service}_recognize/`
+2. **Add required files**:
+   - `info.json` with unique ID and configuration schema
+   - `main.js` implementing the `recognize()` function
+   - `{service}.svg` icon file
+3. **Follow API request pattern** from existing plugins
+4. **Test thoroughly** before packaging
+5. **Build with pack-plugins.py** to create .potext file
+
+## API Integration Guidelines
+
+### OpenAI Vision API
+
+- **Endpoint**: `https://api.openai.com/v1/chat/completions`
+- **Model**: `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo` (vision capable)
+- **Image Format**: `data:image/png;base64,{base64}`
+- **Response**: `result.choices[0].message.content`
+- **Prompt**: System message with OCR instructions
+
+### Mistral AI OCR API
+
+- **Endpoint**: `https://api.mistral.ai/v1/ocr`
+- **Model**: `mistral-ocr-latest`, `pixtral-12b-2409`
+- **Image Format**: `data:image/png;base64,{base64}`
+- **Response**: `result.pages[].markdown` (combine multiple pages)
+- **Note**: Dedicated OCR endpoint, no prompt needed
+
+### Adding New API Providers
+
+When integrating a new vision/OCR API:
+
+1. Study the API documentation for vision/OCR capabilities
+2. Identify the correct endpoint, request format, and response structure
+3. Create info.json with appropriate configuration fields
+4. Implement main.js following the standard pattern
+5. Handle API-specific response formats
+6. Provide helpful default values and error messages
+
+## Pull Request Guidelines
+
+When submitting PRs:
+
+### PR Title Format
+- Use descriptive titles: "Add {Service} OCR plugin" or "Fix {issue} in {plugin}"
+- Start with a verb: Add, Fix, Update, Improve
+
+### PR Description Should Include
+- **What**: Brief description of changes
+- **Why**: Reason for the change
+- **How**: Implementation approach if non-obvious
+- **Testing**: How you tested the changes
+
+### Before Submitting
+- [ ] Code follows existing style and conventions
+- [ ] Plugin builds successfully with pack-plugins.py
+- [ ] Tested in actual Pot App (if possible)
+- [ ] info.json schema is valid
+- [ ] Default values are sensible
+- [ ] Error messages are clear and helpful
+
+## Common Patterns
+
+### Language Code Handling
+
+The `lang` parameter contains ISO language codes from the language map in info.json. Some plugins support language hints:
+
+```javascript
+// Example: Using language in custom prompt
+if (!customPrompt) {
+    customPrompt = "Just recognize the text in the image. Do not offer unnecessary explanations.";
+} else {
+    customPrompt = customPrompt.replaceAll("$lang", lang);
 }
 ```
 
-## Configuration
+### Error Handling
 
-### Required Configuration
-- **apiKey**: OpenAI API key (required)
+Always provide detailed error messages:
 
-### Optional Configuration
-- **model**: Default is "gpt-4o"
-- **requestPath**: Default is "https://api.openai.com"
-- **customPrompt**: Default is "Just recognize the text in the image. Do not offer unnecessary explanations."
+```javascript
+if (res.ok) {
+    // Success handling
+    if (result.pages && result.pages.length > 0) {
+        return result.pages.map(page => page.markdown).join('\n\n');
+    } else {
+        throw `OCR response error: No pages found in response`;
+    }
+} else {
+    throw `Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`;
+}
+```
 
-### Custom Prompt Variables
-- `$lang`: Replaced with the target language at runtime
+## Additional Resources
 
-## Dependencies
+- [Pot App Official Site](https://pot-app.com/)
+- [Pot App GitHub](https://github.com/pot-app/pot-desktop)
+- [OpenAI Vision API Documentation](https://platform.openai.com/docs/guides/vision)
+- [Mistral AI Documentation](https://docs.mistral.ai/)
 
-### External APIs
-- OpenAI Chat Completions API (v1)
+## Notes for AI Agents
 
-### Runtime Dependencies
-- Pot-App framework
-- Tauri (for `tauriFetch` utility)
-
-### No Package Manager
-This project has no npm/yarn dependencies as it's a pure JavaScript plugin for Pot-App.
-
-## Common Issues & Solutions
-
-### Issue: API Request Fails
-**Solution**: Check that:
-1. API key is valid and has sufficient credits
-2. Request path is correctly formatted
-3. Network connectivity is available
-4. Model name is correct
-
-### Issue: Empty or Incorrect Recognition
-**Solution**:
-1. Try a different model (gpt-4o recommended)
-2. Ensure image quality is sufficient
-3. Customize the prompt for better context
-4. Check if the image contains recognizable text
-
-## Contributing Guidelines
-
-### Code Modifications
-1. Keep the `recognize()` function signature unchanged
-2. Maintain compatibility with Pot-App plugin system
-3. Test with multiple image types and languages
-4. Document any new configuration options in `info.json`
-
-### Pull Request Guidelines
-When submitting PRs:
-- **Title**: Brief description of the change
-- **Description**: Explain what changed and why
-- **Testing**: Describe how you tested the changes
-- **Breaking Changes**: Clearly mark any breaking changes
-
-## AI Assistant Notes
-
-### When Modifying This Plugin
-1. The `recognize()` function is the only public interface - don't change its signature
-2. Use `tauriFetch` from `utils` for HTTP requests (not standard fetch)
-3. Always include proper error messages with HTTP status codes
-4. Base64 image data should be prefixed with the data URI scheme when sent to OpenAI
-5. The `$lang` placeholder in custom prompts must be replaced before sending to API
-
-### Code Generation Best Practices
-- Maintain the existing code style (async/await, destructuring)
-- Add validation for new configuration options
-- Include descriptive error messages
-- Consider backward compatibility with existing configurations
+- Always maintain backward compatibility with existing plugins
+- Preserve the existing code style and patterns
+- Test changes with the pack-plugins.py script before committing
+- Keep error messages user-friendly and actionable
+- Document any new configuration options in info.json
+- Follow the established patterns for API requests and response handling
