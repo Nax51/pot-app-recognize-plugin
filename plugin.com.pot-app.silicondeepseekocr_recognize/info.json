@@ -1,0 +1,59 @@
+{
+  "id": "plugin.com.pot-app.silicondeepseekocr_recognize",
+  "plugin_type": "recognize",
+  "icon": "deepseek.svg",
+  "display": "Silicon DeepSeek OCR",
+  "homepage": "https://github.com/pot-app/pot-app-recognize-plugin",
+  "needs": [
+    {
+      "key": "model",
+      "display": "模型",
+      "type": "input",
+      "default": "deepseek-ai/DeepSeek-OCR"
+    },
+    {
+      "key": "requestPath",
+      "display": "請求路徑",
+      "type": "input",
+      "default": "https://api.siliconflow.cn/v1"
+    },
+    {
+      "key": "apiKey",
+      "display": "API Key",
+      "type": "input"
+    }
+  ],
+  "language": {
+    "auto": "Auto",
+    "zh_cn": "Simplified Chinese",
+    "zh_tw": "Traditional Chinese",
+    "yue": "Cantonese",
+    "ja": "Japanese",
+    "en": "English",
+    "ko": "Korean",
+    "fr": "French",
+    "es": "Spanish",
+    "ru": "Russian",
+    "de": "German",
+    "it": "Italian",
+    "tr": "Turkish",
+    "pt_pt": "Portuguese",
+    "pt_br": "Brazilian Portuguese",
+    "vi": "Vietnamese",
+    "id": "Indonesian",
+    "th": "Thai",
+    "ms": "Malay",
+    "ar": "Arabic",
+    "hi": "Hindi",
+    "mn_mo": "Mongolian",
+    "mn_cy": "Mongolian(Cyrillic)",
+    "km": "Khmer",
+    "nb_no": "Norwegian Bokmål",
+    "nn_no": "Norwegian Nynorsk",
+    "fa": "Persian",
+    "sv": "Swedish",
+    "pl": "Polish",
+    "nl": "Dutch",
+    "uk": "Ukrainian"
+  }
+}

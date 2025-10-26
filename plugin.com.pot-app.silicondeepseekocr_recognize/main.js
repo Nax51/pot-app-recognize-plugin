@@ -1,0 +1,63 @@
+async function recognize(base64, lang, options) {
+    const { config, utils } = options;
+    const { tauriFetch: fetch } = utils;
+    let { model = "deepseek-ai/DeepSeek-OCR", apiKey, requestPath } = config;
+
+    if (!requestPath) {
+        requestPath = "https://api.siliconflow.cn/v1";
+    }
+    if (!/https?:\/\/.+/.test(requestPath)) {
+        requestPath = `https://${requestPath}`;
+    }
+    if (requestPath.endsWith('/')) {
+        requestPath = requestPath.slice(0, -1);
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+    }
+
+    const body = {
+        model: model,
+        messages: [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "image_url",
+                        image_url: {
+                            url: `data:image/png;base64,${base64}`
+                        }
+                    },
+                    {
+                        type: "text",
+                        text: "OCR this image.(請特別注意中文字的繁/簡體識別)"
+                    }
+                ]
+            }
+        ]
+    }
+
+    let res = await fetch(requestPath + "/chat/completions", {
+        method: 'POST',
+        url: requestPath + "/chat/completions",
+        headers: headers,
+        body: {
+            type: "Json",
+            payload: body
+        }
+    });
+
+    if (res.ok) {
+        let result = res.data;
+        // DeepSeek OCR API returns choices array with message content
+        if (result.choices && result.choices.length > 0) {
+            return result.choices[0].message.content;
+        } else {
+            throw `OCR response error: No choices found in response`;
+        }
+    } else {
+        throw `Http Request Error\nHttp Status: ${res.status}\n${JSON.stringify(res.data)}`;
+    }
+}

@@ -1,304 +1,129 @@
-# Pot App Recognize Plugins
+# Pot App 識別插件
 
-OCR (Optical Character Recognition) plugins for [Pot App](https://pot-app.com/) using AI vision models.
+為 [Pot App](https://pot-app.com/) 划词翻譯提供的 AI 光學字元識別 (OCR) 插件。
 
-## 📦 Available Plugins
+## 📦 可用插件
 
-### OpenAI Vision Plugin
+### OpenAI Vision 插件
 
-OCR plugin using OpenAI's vision-capable models (GPT-4o, GPT-4o-mini, etc.).
+使用 OpenAI 視覺模型的 OCR 插件。
 
-**Features:**
-- Support for all GPT-4 vision models
-- Customizable prompts with language variable support
-- Flexible API endpoint configuration
-- High accuracy text recognition
-- Multi-language support
+**預設設定：**
+- 模型：`gpt-5-mini`
+- 端點：`https://api.openai.com/v1/chat/completions`
 
-**Default Configuration:**
-- Model: `gpt-4o-mini`
-- Endpoint: `https://api.openai.com/v1/chat/completions`
+### Mistral AI OCR 插件
 
-### Mistral AI OCR Plugin
+使用 Mistral AI 專業 OCR API 的插件。
 
-OCR plugin using Mistral AI's dedicated OCR API with Pixtral models.
+**預設設定：**
+- 模型：`mistral-ocr-latest`
+- 端點：`https://api.mistral.ai/v1/ocr`
 
-**Features:**
-- Specialized OCR endpoint
-- Markdown-formatted output
-- Multi-page document support
-- Fast processing
-- Multi-language support
+### Silicon DeepSeek OCR 插件
 
-**Default Configuration:**
-- Model: `mistral-ocr-latest`
-- Endpoint: `https://api.mistral.ai/v1/ocr`
+使用 SiliconFlow 平台的 DeepSeek OCR 模型插件。
 
-## 🚀 Installation
+**預設設定：**
+- 模型：`deepseek-ai/DeepSeek-OCR`
+- 端點：`https://api.siliconflow.cn/v1/chat/completions`
 
-### Option 1: Download Pre-built Plugins
+## 🚀 安裝方式
 
-1. Download the `.potext` files from [Releases](../../releases)
-   - `plugin.com.pot-app.openai_recognize.potext`
-   - `plugin.com.pot-app.mistralai_recognize.potext`
+### 方法一：下載現成插件
 
-2. Install in Pot App:
-   - Open Pot App
-   - Go to Settings → Plugins → Recognize
-   - Click "Install Plugin"
-   - Select the downloaded `.potext` file
+1. 從 [Releases](../../releases) 下載 `.potext` 檔案
+2. 在 Pot App 中安裝：
+   - 開啟 Pot App
+   - 前往 設定 → 插件 → 識別
+   - 點擊「安裝插件」
+   - 選擇下載的 `.potext` 檔案
 
-### Option 2: Build from Source
+### 方法二：從原始碼建置
 
 ```bash
-# Clone the repository
+# 複製儲存庫
 git clone https://github.com/pot-app/pot-app-recognize-plugin.git
 cd pot-app-recognize-plugin
 
-# Build all plugins
+# 建置所有插件
 python3 script/pack-plugins.py
 
-# The .potext files will be created in the project root
+# .potext 檔案會在專案根目錄中生成
 ```
 
-## ⚙️ Configuration
+## ⚙️ 設定說明
 
-### OpenAI Plugin
+每個插件都需要設定 API Key：
 
-Required settings in Pot App:
+| 插件 | 必要設定 | API Key 取得 |
+|------|----------|-------------|
+| OpenAI | API Key (必填) | [OpenAI Platform](https://platform.openai.com/) |
+| Mistral | API Key (必填) | [Mistral AI Console](https://console.mistral.ai/) |
+| DeepSeek | API Key (必填) | [SiliconFlow](https://siliconflow.cn/) |
 
-| Setting | Description | Default | Required |
-|---------|-------------|---------|----------|
-| API Key | Your OpenAI API key | - | ✅ |
-| Model | Model name | `gpt-4o-mini` | ❌ |
-| Request Path | API endpoint | `https://api.openai.com` | ❌ |
-| Custom Prompt | OCR instruction prompt | See below | ❌ |
+## 🌍 支援語言
 
-**Default Prompt:**
-```
-Just recognize the text in the image. Do not offer unnecessary explanations.
-```
+所有插件都支援多語言識別：
 
-**Custom Prompt with Language Variable:**
-```
-Recognize text in $lang language from the image. Return only the text.
-```
-The `$lang` variable will be replaced with the selected language.
+- **中文**：簡體、繁體、粵語
+- **東亞語言**：日語、韓語
+- **歐洲語言**：英語、法語、西班牙語、德語、義大利語、葡萄牙語、荷蘭語、瑞典語、波蘭語、烏克蘭語、挪威語
+- **其他語言**：俄語、土耳其語、越南語、印尼語、泰語、馬來語、阿拉伯語、印地語、蒙古語、高棉語、波斯語
 
-**Recommended Models:**
-- `gpt-4o` - Latest and most capable
-- `gpt-4o-mini` - Faster and more cost-effective (recommended)
-- `gpt-4-turbo` - Previous generation
+## 🔧 建置插件
 
-### Mistral AI Plugin
-
-Required settings in Pot App:
-
-| Setting | Description | Default | Required |
-|---------|-------------|---------|----------|
-| API Key | Your Mistral AI API key | - | ✅ |
-| Model | Model name | `mistral-ocr-latest` | ❌ |
-| Request Path | API endpoint | `https://api.mistral.ai/v1/ocr` | ❌ |
-
-**Available Models:**
-- `mistral-ocr-latest` - Latest OCR model (recommended)
-- `pixtral-12b-2409` - Pixtral vision model
-
-## 🌍 Supported Languages
-
-Both plugins support recognition in multiple languages:
-
-- **Chinese**: Simplified, Traditional, Cantonese
-- **East Asian**: Japanese, Korean
-- **European**: English, French, Spanish, German, Italian, Portuguese, Dutch, Swedish, Polish, Ukrainian, Norwegian
-- **Other**: Russian, Turkish, Vietnamese, Indonesian, Thai, Malay, Arabic, Hindi, Mongolian, Khmer, Persian
-
-The language selection in Pot App helps optimize recognition accuracy for the target language.
-
-## 🔧 API Configuration
-
-### Using Custom Endpoints
-
-Both plugins support custom API endpoints (useful for proxy servers or compatible APIs):
-
-**OpenAI Plugin:**
-```
-https://your-proxy.com/v1/chat/completions
-```
-
-**Mistral Plugin:**
-```
-https://your-proxy.com/v1/ocr
-```
-
-The plugins automatically:
-- Add `https://` if protocol is missing
-- Remove trailing slashes
-- Append correct API paths for OpenAI
-
-## 🛠️ Development
-
-### Project Structure
-
-```
-pot-app-recognize-plugin/
-├── plugin.com.pot-app.openai_recognize/     # OpenAI plugin source
-│   ├── info.json                            # Plugin metadata
-│   ├── main.js                              # Implementation
-│   └── openai.svg                           # Icon
-├── plugin.com.pot-app.mistralai_recognize/  # Mistral plugin source
-│   ├── info.json                            # Plugin metadata
-│   ├── main.js                              # Implementation
-│   └── mistral.svg                          # Icon
-├── script/
-│   ├── pack-plugins.py                      # Build script (Python)
-│   └── pack-plugins.sh                      # Build script (Bash)
-└── *.potext                                 # Compiled plugins
-```
-
-### Building Plugins
-
-**Build all plugins:**
+**建置所有插件：**
 ```bash
 python3 script/pack-plugins.py
 ```
 
-**Build specific plugin:**
+**建置特定插件：**
 ```bash
-python3 script/pack-plugins.py plugin.com.pot-app.openai_recognize
+python3 script/pack-plugins.py plugin.com.pot-app.silicondeepseekocr_recognize
 ```
-
-The build script:
-- Validates required files (info.json, main.js, icon.svg)
-- Creates ZIP archives with `.potext` extension
-- Includes only essential files for distribution
-
-### Plugin API
-
-Each plugin implements the `recognize()` function:
-
-```javascript
-async function recognize(base64, lang, options) {
-    const { config, utils } = options;
-    const { tauriFetch: fetch } = utils;
-    
-    // Extract configuration
-    let { model, apiKey, requestPath } = config;
-    
-    // Make API request
-    let res = await fetch(requestPath, {
-        method: 'POST',
-        url: requestPath,
-        headers: { /* ... */ },
-        body: { type: "Json", payload: { /* ... */ } }
-    });
-    
-    // Return recognized text
-    return extractedText;
-}
-```
-
-**Parameters:**
-- `base64` - Base64-encoded image data
-- `lang` - Language code (e.g., "zh_cn", "en", "ja")
-- `options.config` - User configuration from Pot App
-- `options.utils.tauriFetch` - HTTP fetch wrapper
-
-**Returns:** String containing recognized text
-
-### Adding New Plugins
-
-1. Create plugin directory: `plugin.com.pot-app.{service}_recognize/`
-2. Add required files:
-   - `info.json` - Plugin metadata and configuration schema
-   - `main.js` - Implementation with `recognize()` function
-   - `{service}.svg` - Plugin icon
-3. Test thoroughly
-4. Build with `pack-plugins.py`
-5. Submit PR
-
-See [AGENTS.md](./AGENTS.md) for detailed development guidelines.
 
 ## 📝 API Keys
 
-### Getting API Keys
+### 取得 API Keys
 
-**OpenAI:**
-1. Visit [OpenAI Platform](https://platform.openai.com/)
-2. Sign up or log in
-3. Go to [API Keys](https://platform.openai.com/api-keys)
-4. Create new secret key
+**OpenAI：**
+1. 前往 [OpenAI Platform](https://platform.openai.com/)
+2. 註冊或登入
+3. 前往 [API Keys](https://platform.openai.com/api-keys)
+4. 建立新的 API Key
 
-**Mistral AI:**
-1. Visit [Mistral AI Console](https://console.mistral.ai/)
-2. Sign up or log in
-3. Go to API Keys section
-4. Generate new API key
+**Mistral AI：**
+1. 前往 [Mistral AI Console](https://console.mistral.ai/)
+2. 註冊或登入
+3. 前往 API Keys 區域
+4. 生成新的 API Key
 
-### Security Notes
+**SiliconFlow：**
+1. 前往 [SiliconFlow](https://siliconflow.cn/)
+2. 註冊或登入
+3. 前往控制台
+4. 取得 API Key
 
-- Never commit API keys to version control
-- Keep your API keys secure
-- Use environment variables or secure storage
-- Monitor API usage and costs
+## ❓ 常見問題
 
-## 🤝 Contributing
+**「API Key 未設定」**
+- 確認在 Pot App 設定中輸入了有效的 API Key
 
-Contributions are welcome! Please follow these guidelines:
+**「HTTP 請求錯誤」**
+- 檢查網路連線
+- 確認 API 端點正確
+- 確保 API Key 有足夠額度
 
-1. Fork the repository
-2. Create a feature branch
-3. Follow existing code style and patterns
-4. Test your changes thoroughly
-5. Submit a pull request
+**「無法識別文字」**
+- 嘗試更清晰的圖片
+- 確保圖片包含可讀文字
+- 檢查選擇語言是否符合文字
 
-See [AGENTS.md](./AGENTS.md) for detailed coding conventions and guidelines.
+## 🔗 相關連結
 
-## 📄 License
-
-Each plugin directory contains its own LICENSE file. Please refer to individual plugin directories for license information.
-
-## 🔗 Links
-
-- [Pot App Official Site](https://pot-app.com/)
+- [Pot App 官方網站](https://pot-app.com/)
 - [Pot App GitHub](https://github.com/pot-app/pot-desktop)
-- [OpenAI API Documentation](https://platform.openai.com/docs/)
-- [Mistral AI Documentation](https://docs.mistral.ai/)
-
-## ❓ Troubleshooting
-
-### Common Issues
-
-**"API Key not configured"**
-- Make sure you've entered a valid API key in Pot App settings
-
-**"Http Request Error"**
-- Check your internet connection
-- Verify API endpoint is correct
-- Ensure API key has sufficient credits
-
-**"No text recognized"**
-- Try a clearer image
-- Ensure the image contains readable text
-- Check if the selected language matches the text
-
-**"Model not found"**
-- Verify the model name is correct
-- Check if your API key has access to the specified model
-- Try using the default model
-
-### Getting Help
-
-If you encounter issues:
-1. Check the [Issues](../../issues) page
-2. Search for similar problems
-3. Create a new issue with:
-   - Plugin version
-   - Error message
-   - Steps to reproduce
-
-## 🙏 Acknowledgments
-
-- [Pot App](https://pot-app.com/) - Cross-platform translation and OCR tool
-- [OpenAI](https://openai.com/) - Vision-capable language models
-- [Mistral AI](https://mistral.ai/) - OCR and vision models
+- [OpenAI API 文件](https://platform.openai.com/docs/)
+- [Mistral AI 文件](https://docs.mistral.ai/)
+- [SiliconFlow 平台](https://siliconflow.cn/)
