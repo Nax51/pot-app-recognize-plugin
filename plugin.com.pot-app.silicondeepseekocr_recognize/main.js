@@ -1,7 +1,7 @@
 async function recognize(base64, lang, options) {
     const { config, utils } = options;
     const { tauriFetch: fetch } = utils;
-    let { model = "deepseek-ai/DeepSeek-OCR", apiKey, requestPath } = config;
+    let { model = "deepseek-ai/DeepSeek-OCR", apiKey, requestPath, customPrompt } = config;
 
     if (!requestPath) {
         requestPath = "https://api.siliconflow.cn/v1";
@@ -11,6 +11,11 @@ async function recognize(base64, lang, options) {
     }
     if (requestPath.endsWith('/')) {
         requestPath = requestPath.slice(0, -1);
+    }
+    if (!customPrompt) {
+        customPrompt = "<|grounding|>OCR this image.";
+    } else {
+        customPrompt = customPrompt.replaceAll("$lang", lang);
     }
 
     const headers = {
@@ -25,14 +30,14 @@ async function recognize(base64, lang, options) {
                 role: "user",
                 content: [
                     {
+                        type: "text",
+                        text: `<image>\n${customPrompt}`
+                    },
+                    {
                         type: "image_url",
                         image_url: {
                             url: `data:image/png;base64,${base64}`
                         }
-                    },
-                    {
-                        type: "text",
-                        text: "OCR this image.(請特別注意中文字的繁/簡體識別)"
                     }
                 ]
             }

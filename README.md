@@ -105,6 +105,35 @@ python3 script/pack-plugins.py plugin.com.pot-app.silicondeepseekocr_recognize
 3. 前往控制台
 4. 取得 API Key
 
+## 💡 提示詞建議
+
+### DeepSeek OCR 官方提示詞
+
+DeepSeek OCR 支援特定的提示詞格式，根據官方文檔建議：
+
+| 用途 | 提示詞 | 說明 |
+|------|--------|------|
+| **純文字識別（推薦）** | `<|grounding|>OCR this image.` | 只提取文字內容，最乾淨的輸出 |
+| **純文字，無版面** | `Free OCR.` | 基礎文字識別，不保留版面結構 |
+| **文件轉 Markdown** | `<|grounding|>Convert the document to markdown.` | 保留文件格式，轉為 Markdown |
+| **指定語言識別** | `<|grounding|>OCR this image in Traditional Chinese.` | 指定輸出語言 |
+| **分析圖表** | `Parse the figure.` | 適合圖表、表格分析 |
+| **詳細描述** | `Describe this image in detail.` | 包含圖片內容描述 |
+
+### 使用技巧
+
+1. **只要文字**：使用 `<|grounding|>OCR this image.`
+2. **多語言支援**：在 Pot App 中自定義提示詞，如：`<|grounding|>OCR this image in $lang.`
+3. **文件處理**：使用 `<|grounding|>Convert the document to markdown.` 保留格式
+4. **避免多餘內容**：避免使用 "Describe" 或 "Analyze" 等詞語
+
+### OpenAI 提示詞範例
+
+| 用途 | 提示詞 |
+|------|--------|
+| **基礎文字識別** | `Just recognize the text in the image. Do not offer unnecessary explanations.` |
+| **多語言支援** | `Recognize text in $lang language from the image. Return only the text.` |
+
 ## ❓ 常見問題
 
 **「API Key 未設定」**
@@ -119,6 +148,10 @@ python3 script/pack-plugins.py plugin.com.pot-app.silicondeepseekocr_recognize
 - 嘗試更清晰的圖片
 - 確保圖片包含可讀文字
 - 檢查選擇語言是否符合文字
+
+**「DeepSeek OCR 輸出奇怪內容」**
+- 使用 `<|grounding|>OCR this image.` 提示詞
+- 或嘗試 `Free OCR.` 獲取最簡潔的輸出
 
 ## 🔗 相關連結
 
