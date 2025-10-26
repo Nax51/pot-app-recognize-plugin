@@ -13,7 +13,7 @@ async function recognize(base64, lang, options) {
         requestPath = requestPath.slice(0, -1);
     }
     if (!customPrompt) {
-        customPrompt = "<|grounding|>OCR this image.";
+        customPrompt = "Free OCR.";
     } else {
         customPrompt = customPrompt.replaceAll("$lang", lang);
     }

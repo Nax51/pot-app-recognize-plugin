@@ -26,7 +26,13 @@
 
 **預設設定：**
 - 模型：`deepseek-ai/DeepSeek-OCR`
-- 端點：`https://api.siliconflow.cn/v1/chat/completions`
+- 端點：`https://api.siliconflow.cn/v1`
+- 預設提示詞：`Free OCR.`
+
+**特色：**
+- 專業 OCR 模型，純文字提取
+- 支援客制提示詞與 `$lang` 變數
+- 低輸出冗餘，適合純文字識別
 
 ## 🚀 安裝方式
 
@@ -107,25 +113,31 @@ python3 script/pack-plugins.py plugin.com.pot-app.silicondeepseekocr_recognize
 
 ## 💡 提示詞建議
 
-### DeepSeek OCR 官方提示詞
+### DeepSeek OCR 提示詞精選
 
-DeepSeek OCR 支援特定的提示詞格式，根據官方文檔建議：
+根據實測與官方文檔，整理出最佳提示詞清單：
 
-| 用途 | 提示詞 | 說明 |
-|------|--------|------|
-| **純文字識別（推薦）** | `<|grounding|>OCR this image.` | 只提取文字內容，最乾淨的輸出 |
-| **純文字，無版面** | `Free OCR.` | 基礎文字識別，不保留版面結構 |
-| **文件轉 Markdown** | `<|grounding|>Convert the document to markdown.` | 保留文件格式，轉為 Markdown |
-| **指定語言識別** | `<|grounding|>OCR this image in Traditional Chinese.` | 指定輸出語言 |
-| **分析圖表** | `Parse the figure.` | 適合圖表、表格分析 |
-| **詳細描述** | `Describe this image in detail.` | 包含圖片內容描述 |
+| 用途 | 提示詞 | 實測效果 |
+|------|--------|----------|
+| **🎯 純文字識別（推薦）** | `Free OCR.` | ✅ 最乾淨，零冗餘 |
+| **📄 文件轉 Markdown** | `<|grounding|>Convert the document to markdown.` | ✅ 保留格式，適合文件 |
+| **🌍 指定語言** | `Free OCR. Output in $lang.` | ✅ 多語言支援 |
+| **⚠️ 複雜版面分析** | `<|grounding|>OCR this image.` | ⚠️ 可能有多餘解釋 |
 
-### 使用技巧
+### 🚀 實測發現
 
-1. **只要文字**：使用 `<|grounding|>OCR this image.`
-2. **多語言支援**：在 Pot App 中自定義提示詞，如：`<|grounding|>OCR this image in $lang.`
-3. **文件處理**：使用 `<|grounding|>Convert the document to markdown.` 保留格式
-4. **避免多餘內容**：避免使用 "Describe" 或 "Analyze" 等詞語
+**重要更新**：經實測發現 SiliconFlow 的 DeepSeek OCR 對提示詞反應敏感：
+
+- ✅ **`Free OCR.`**：純文字提取，零解釋（推薦預設）
+- ✅ **`Free OCR. Output in Traditional Chinese.`**：指定語言效果佳
+- ⚠️ **`<|grounding|>OCR this image.`**：可能加入版面分析或解釋
+
+### 💡 使用技巧
+
+1. **只要純文字**：直接使用 `Free OCR.`
+2. **多語言專案**：自定義提示詞 `Free OCR. Output in $lang.`
+3. **文件轉換**：使用 `<|grounding|>Convert the document to markdown.`
+4. **避免冗餘**：勿使用 `Describe`、`Analyze` 等詞語
 
 ### OpenAI 提示詞範例
 
@@ -150,8 +162,9 @@ DeepSeek OCR 支援特定的提示詞格式，根據官方文檔建議：
 - 檢查選擇語言是否符合文字
 
 **「DeepSeek OCR 輸出奇怪內容」**
-- 使用 `<|grounding|>OCR this image.` 提示詞
-- 或嘗試 `Free OCR.` 獲取最簡潔的輸出
+- ✅ **最佳解決方案**：切換為 `Free OCR.` 提示詞
+- ⚠️ **避免使用**：`<|grounding|>OCR this image.` 可能產生解釋性內容
+- 💡 **進階用法**：`Free OCR. Output in Traditional Chinese.` 指定語言
 
 ## 🔗 相關連結
 
